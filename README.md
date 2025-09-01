@@ -1,5 +1,9 @@
 # Conway's Game of Life using Raylib and ImGui
 
+## Showcase
+
+<img src="showcase.gif" alt="game of life showcase" width="600"/>
+
 ## Setup and compilation
 
 1. Clone the repository
