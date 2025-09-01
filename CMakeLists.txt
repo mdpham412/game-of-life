@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 4.0)
 
 project(game-of-life VERSION 1.0 LANGUAGES CXX)
 
@@ -54,13 +54,10 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
-
-if (APPLE)
+if (WIN32)
+    set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE TRUE)
+elseif(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
 elseif(UNIX AND NOT APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE m pthread dl GL rt X11)
-endif()
-
-if (WIN32)
-    target_link_options(${PROJECT_NAME} PRIVATE /SUBSYSTEM:CONSOLE)
 endif()
