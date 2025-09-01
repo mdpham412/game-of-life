@@ -10,7 +10,6 @@
 void initGrid(int col = 40, int row = 40);
 bool positionInSquare(Vector2 pos, Vector2 squareCenter, int squareSide);
 int getGridIndex(int row, int col);
-void updateSquare(int row, int col);
 void updateGrid();
 void drawGrid();
 

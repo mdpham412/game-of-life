@@ -24,6 +24,9 @@ int main(int argc, char* argv[]) {
 
   bool continueWindow = true;
   bool shouldUpdateGrid = false;
+  int rows = 40;
+  int cols = 40;
+  int speed = 10;  // updates per second
   initGrid();
 
   std::chrono::steady_clock::time_point begin =
@@ -33,8 +36,13 @@ int main(int argc, char* argv[]) {
     std::chrono::steady_clock::time_point end =
         std::chrono::steady_clock::now();
 
+    if (IsKeyPressed(KEY_SPACE)) {
+      shouldUpdateGrid = !shouldUpdateGrid;
+    }
+
+    long long update_interval_us = 1000000 / speed;
     if (std::chrono::duration_cast<std::chrono::microseconds>(end - begin)
-            .count() > 1000000) {
+            .count() > update_interval_us) {
       begin = std::chrono::steady_clock::now();
       if (shouldUpdateGrid) {
         updateGrid();
@@ -51,8 +59,27 @@ int main(int argc, char* argv[]) {
     ImGui::DockSpaceOverViewport(0, NULL,
                                  ImGuiDockNodeFlags_PassthruCentralNode);
 
-    if (ImGui::Begin("Test Window")) {
-      ImGui::TextUnformatted("Another window");
+    if (ImGui::Begin("Controls")) {
+      ImGui::Text("Grid Customization");
+      bool rows_changed = ImGui::SliderInt("Rows", &rows, 10, 200);
+      bool cols_changed = ImGui::SliderInt("Columns", &cols, 10, 200);
+      if (rows_changed || cols_changed) {
+        initGrid(cols, rows);
+        shouldUpdateGrid = false;
+      }
+
+      ImGui::Separator();
+      ImGui::Text("Simulation Controls");
+      ImGui::SliderInt("Speed (updates/sec)", &speed, 1, 60);
+
+      if (ImGui::Button(shouldUpdateGrid ? "Pause" : "Play")) {
+        shouldUpdateGrid = !shouldUpdateGrid;
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Reset")) {
+        initGrid(cols, rows);
+        shouldUpdateGrid = false;
+      }
     }
 
     DrawFPS(0, 0);

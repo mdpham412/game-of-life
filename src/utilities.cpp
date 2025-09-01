@@ -3,6 +3,7 @@
 int squaresInColumn;
 int squaresInRow;
 std::vector<bool> activated;
+std::vector<bool> activated_copy;
 
 void initGrid(int col, int row) {
   squaresInColumn = col;
@@ -19,72 +20,81 @@ bool positionInSquare(Vector2 pos, Vector2 squareCenter, int squareSide) {
   return false;
 }
 
-int getGridIndex(int row, int col) { return row * squaresInRow + col; }
+int getGridIndex(int row, int col) { return row * squaresInColumn + col; }
 
-void updateSquare(int row, int col) {
-  int count = 0;
+void updateGrid() {
+  std::vector<bool> nextActivated = activated;
 
-  for (int dr = -1; dr <= 1; dr++) {
-    for (int dc = -1; dc <= 1; dc++) {
-      if (dr == 0 && dc == 0) continue;
+  for (int row = 0; row < squaresInRow; row++) {
+    for (int col = 0; col < squaresInColumn; col++) {
+      int count = 0;
 
-      int nr = row + dr;
-      int nc = col + dc;
+      for (int dr = -1; dr <= 1; dr++) {
+        for (int dc = -1; dc <= 1; dc++) {
+          if (dr == 0 && dc == 0) continue;
 
-      if (nr >= 0 && nr < squaresInColumn && nc >= 0 && nc < squaresInRow) {
-        int idx = getGridIndex(nr, nc);
-        if (activated[idx]) count++;
+          int nr = row + dr;
+          int nc = col + dc;
+
+          if (nr >= 0 && nr < squaresInRow && nc >= 0 && nc < squaresInColumn) {
+            int idx = getGridIndex(nr, nc);
+            if (activated[idx]) count++;
+          }
+        }
+      }
+
+      int current_idx = getGridIndex(row, col);
+      if (!activated[current_idx]) {
+        if (count == 3) nextActivated[current_idx] = true;
+      } else {
+        if (count > 3)
+          nextActivated[current_idx] = false;
+        else if (count < 2)
+          nextActivated[current_idx] = false;
       }
     }
   }
-
-  if (!activated[getGridIndex(row, col)]) {
-    if (count == 3) activated[getGridIndex(row, col)] = true;
-  } else {
-    if (count > 3)
-      activated[getGridIndex(row, col)] = false;
-    else if (count < 2)
-      activated[getGridIndex(row, col)] = false;
-  }
-}
-
-void updateGrid() {
-  for (int row = 0; row < squaresInColumn; row++) {
-    for (int col = 0; col < squaresInRow; col++) {
-      updateSquare(row, col);
-    }
-  }
+  activated = nextActivated;
 }
 
 void drawGrid() {
-  int squareSize = std::min(GetScreenWidth() / squaresInRow,
-                            GetScreenHeight() / squaresInColumn) -
-                   5;
+  int squareSize = std::min(GetScreenWidth() / squaresInColumn,
+                            GetScreenHeight() / squaresInRow) -
+                   1;
+
+  int gridWidth = squaresInColumn * squareSize;
+  int gridHeight = squaresInRow * squareSize;
   int paddingX = (GetScreenWidth() - squaresInColumn * squareSize) / 2;
   int paddingY = (GetScreenHeight() - squaresInRow * squareSize) / 2;
 
   bool mouseDown{};
 
-  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) mouseDown = true;
-
-  for (int row = 0; row < squaresInColumn; row++) {
-    for (int col = 0; col < squaresInRow; col++) {
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    Vector2 mousePos = GetMousePosition();
+    if (mousePos.x >= paddingX && mousePos.x < paddingX + gridWidth &&
+        mousePos.y >= paddingY && mousePos.y < paddingY + gridHeight) {
+      int col = (mousePos.x - paddingX) / squareSize;
+      int row = (mousePos.y - paddingY) / squareSize;
       int index = getGridIndex(row, col);
+      activated[index] = !activated[index];
+    }
+  }
 
-      int x = paddingX + col * squareSize;
-      int y = paddingY + row * squareSize;
+  for (int i = 0; i <= squaresInRow; i++) {
+    DrawLine(paddingX, paddingY + i * squareSize, paddingX + gridWidth,
+             paddingY + i * squareSize, LIGHTGRAY);
+  }
+  for (int i = 0; i <= squaresInColumn; i++) {
+    DrawLine(paddingX + i * squareSize, paddingY, paddingX + i * squareSize,
+             paddingY + gridHeight, LIGHTGRAY);
+  }
 
-      Color curSquareColor = activated[index] ? BLACK : WHITE;
-
-      if (mouseDown &&
-          positionInSquare(GetMousePosition(),
-                           Vector2(x + squareSize / 2, y + squareSize / 2),
-                           squareSize)) {
-        activated[index] = !activated[index];
+  for (int row = 0; row < squaresInRow; row++) {
+    for (int col = 0; col < squaresInColumn; col++) {
+      if (activated[getGridIndex(row, col)]) {
+        DrawRectangle(paddingX + col * squareSize, paddingY + row * squareSize,
+                      squareSize, squareSize, BLACK);
       }
-
-      DrawRectangleLines(x, y, squareSize, squareSize, WHITE);
-      DrawRectangle(x, y, squareSize, squareSize, curSquareColor);
     }
   }
 }
