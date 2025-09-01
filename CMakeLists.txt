@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.12)
 
 project(game-of-life VERSION 1.0 LANGUAGES CXX)
 
