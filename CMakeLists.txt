@@ -11,7 +11,7 @@ file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 file(GLOB_RECURSE RLIMGUI_FILES "${PROJECT_SOURCE_DIR}/build/_deps/rllmgui-src/*.cpp")
 file(GLOB_RECURSE IMGUI_FILES "${PROJECT_SOURCE_DIR}/build/_deps/imgui-src/*.cpp")
 set(IMGUI_BACKENDS ${PROJECT_SOURCE_DIR}/build/_deps/imgui-src/backends/imgui_impl_opengl3.cpp 
-                   ${PROJECT_SOURCE_DIR}/build/_deps/imgui-src/backends/imgui_impl_win32.cpp)
+                   ${PROJECT_SOURCE_DIR}/build/_deps/imgui-src/backends/imgui_impl_glfw.cpp)
 
 list(FILTER RLIMGUI_FILES EXCLUDE REGEX ".*/examples/.*")
 list(FILTER IMGUI_FILES EXCLUDE REGEX ".*/examples/.*")
@@ -52,12 +52,15 @@ target_include_directories(${PROJECT_NAME}
         ${rllmgui_SOURCE_DIR}
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib PRIVATE dwmapi)
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
-if (WIN32)
-    set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE TRUE)
-elseif(APPLE)
+
+if (APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
 elseif(UNIX AND NOT APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE m pthread dl GL rt X11)
+endif()
+
+if (WIN32)
+    target_link_options(${PROJECT_NAME} PRIVATE /SUBSYSTEM:CONSOLE)
 endif()

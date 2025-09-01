@@ -56,6 +56,15 @@ jobs:
             libxcursor-dev \
             libxi-dev
 
+      - name: Restore CMake FetchContent cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            build/_deps
+          key: cmake-fetchcontent-${{ matrix.os }}-${{ matrix.build_type }}-${{ hashFiles('CMakeLists.txt') }}
+          restore-keys: |
+            cmake-fetchcontent-${{ matrix.os }}-${{ matrix.build_type }}-
+
       - name: Set reusable strings
         # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
         id: strings
