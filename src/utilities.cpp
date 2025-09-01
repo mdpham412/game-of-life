@@ -29,6 +29,7 @@ void updateGrid() {
     for (int col = 0; col < squaresInColumn; col++) {
       int count = 0;
 
+      // Calculate the neighbors of a cell
       for (int dr = -1; dr <= 1; dr++) {
         for (int dc = -1; dc <= 1; dc++) {
           if (dr == 0 && dc == 0) continue;
@@ -43,6 +44,7 @@ void updateGrid() {
         }
       }
 
+      // Rules
       int current_idx = getGridIndex(row, col);
       if (!activated[current_idx]) {
         if (count == 3) nextActivated[current_idx] = true;
@@ -69,6 +71,7 @@ void drawGrid() {
 
   bool mouseDown{};
 
+  // Square activation check
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
     Vector2 mousePos = GetMousePosition();
     if (mousePos.x >= paddingX && mousePos.x < paddingX + gridWidth &&
@@ -89,6 +92,7 @@ void drawGrid() {
              paddingY + gridHeight, LIGHTGRAY);
   }
 
+  // Draw activaated cells
   for (int row = 0; row < squaresInRow; row++) {
     for (int col = 0; col < squaresInColumn; col++) {
       if (activated[getGridIndex(row, col)]) {

@@ -14,6 +14,7 @@ float ScaleToDPIF(float value) { return GetWindowScaleDPI().x * value; }
 int ScaleToDPII(int value) { return int(GetWindowScaleDPI().x * value); }
 
 int main(int argc, char* argv[]) {
+  // Initial setup
   SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
   InitWindow(screenWidth, screenHeight, "Game of Life");
   SetTargetFPS(144);
@@ -27,19 +28,18 @@ int main(int argc, char* argv[]) {
   int rows = 40;
   int cols = 40;
   int speed = 10;  // updates per second
-  initGrid();
+
+  initGrid(cols, rows);
 
   std::chrono::steady_clock::time_point begin =
       std::chrono::steady_clock::now();
 
+  // Main loop
   while (!WindowShouldClose() && continueWindow) {
     std::chrono::steady_clock::time_point end =
         std::chrono::steady_clock::now();
 
-    if (IsKeyPressed(KEY_SPACE)) {
-      shouldUpdateGrid = !shouldUpdateGrid;
-    }
-
+    // Checks whether its time to update the grid
     long long update_interval_us = 1000000 / speed;
     if (std::chrono::duration_cast<std::chrono::microseconds>(end - begin)
             .count() > update_interval_us) {
@@ -59,6 +59,7 @@ int main(int argc, char* argv[]) {
     ImGui::DockSpaceOverViewport(0, NULL,
                                  ImGuiDockNodeFlags_PassthruCentralNode);
 
+    // ImGui Options Window
     if (ImGui::Begin("Controls")) {
       ImGui::Text("Grid Customization");
       bool rows_changed = ImGui::SliderInt("Rows", &rows, 10, 200);
@@ -89,6 +90,7 @@ int main(int argc, char* argv[]) {
     EndDrawing();
   }
 
+  // Cleanup
   rlImGuiShutdown();
   CloseWindow();
 
