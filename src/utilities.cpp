@@ -4,20 +4,14 @@ int squaresInColumn;
 int squaresInRow;
 std::vector<bool> activated;
 std::vector<bool> activated_copy;
+Color lineColor = WHITE;
+Color squareColor = WHITE;
+Color backgroundColor = BLACK;
 
 void initGrid(int col, int row) {
   squaresInColumn = col;
   squaresInRow = row;
   activated = std::vector(squaresInColumn * squaresInRow, false);
-}
-
-bool positionInSquare(Vector2 pos, Vector2 squareCenter, int squareSide) {
-  if (pos.x >= squareCenter.x - squareSide / 2 &&
-      pos.x <= squareCenter.x + squareSide / 2 &&
-      pos.y >= squareCenter.y - squareSide / 2 &&
-      pos.y <= squareCenter.y + squareSide / 2)
-    return true;
-  return false;
 }
 
 int getGridIndex(int row, int col) { return row * squaresInColumn + col; }
@@ -72,7 +66,8 @@ void drawGrid() {
   bool mouseDown{};
 
   // Square activation check
-  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+      !ImGui::GetIO().WantCaptureMouse) {
     Vector2 mousePos = GetMousePosition();
     if (mousePos.x >= paddingX && mousePos.x < paddingX + gridWidth &&
         mousePos.y >= paddingY && mousePos.y < paddingY + gridHeight) {
@@ -85,11 +80,11 @@ void drawGrid() {
 
   for (int i = 0; i <= squaresInRow; i++) {
     DrawLine(paddingX, paddingY + i * squareSize, paddingX + gridWidth,
-             paddingY + i * squareSize, LIGHTGRAY);
+             paddingY + i * squareSize, lineColor);
   }
   for (int i = 0; i <= squaresInColumn; i++) {
     DrawLine(paddingX + i * squareSize, paddingY, paddingX + i * squareSize,
-             paddingY + gridHeight, LIGHTGRAY);
+             paddingY + gridHeight, lineColor);
   }
 
   // Draw activaated cells
@@ -97,7 +92,7 @@ void drawGrid() {
     for (int col = 0; col < squaresInColumn; col++) {
       if (activated[getGridIndex(row, col)]) {
         DrawRectangle(paddingX + col * squareSize, paddingY + row * squareSize,
-                      squareSize, squareSize, BLACK);
+                      squareSize, squareSize, squareColor);
       }
     }
   }

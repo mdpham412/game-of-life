@@ -1,5 +1,6 @@
 #include <chrono>
 #include <cmath>
+#include <iostream>
 
 #include "imgui.h"
 #include "raylib.h"
@@ -7,8 +8,8 @@
 #include "rlImGui.h"
 #include "utilities.hpp"
 
-constexpr int screenWidth = 1280;
-constexpr int screenHeight = 800;
+constexpr int screenWidth{1280};
+constexpr int screenHeight{800};
 
 float ScaleToDPIF(float value) { return GetWindowScaleDPI().x * value; }
 int ScaleToDPII(int value) { return int(GetWindowScaleDPI().x * value); }
@@ -25,9 +26,12 @@ int main(int argc, char* argv[]) {
 
   bool continueWindow = true;
   bool shouldUpdateGrid = false;
-  int rows = 40;
-  int cols = 40;
-  int speed = 10;  // updates per second
+  float colorBackground[4]{0.0f, 0.0f, 0.0f, 1.0f};
+  float colorLines[4]{1.0f, 1.0f, 1.0f, 1.0f};
+  float colorSquares[4]{1.0f, 1.0f, 1.0f, 1.0f};
+  int rows{40};
+  int cols{40};
+  int speed{10};  // updates per second
 
   initGrid(cols, rows);
 
@@ -50,7 +54,7 @@ int main(int argc, char* argv[]) {
     }
 
     BeginDrawing();
-    ClearBackground(DARKGRAY);
+    ClearBackground(backgroundColor);
 
     drawGrid();
 
@@ -80,6 +84,26 @@ int main(int argc, char* argv[]) {
       if (ImGui::Button("Reset")) {
         initGrid(cols, rows);
         shouldUpdateGrid = false;
+      }
+      if (ImGui::ColorEdit4("Background Color", (float*)&colorBackground)) {
+        backgroundColor = (Color){(unsigned char)colorBackground[0] * 255,
+                                  (unsigned char)colorBackground[1] * 255,
+                                  (unsigned char)colorBackground[2] * 255,
+                                  (unsigned char)colorBackground[3] * 255};
+      }
+      if (ImGui::ColorEdit4("Lines Color", (float*)&colorLines)) {
+        lineColor = (Color){(unsigned char)colorLines[0] * 255,
+                            (unsigned char)colorLines[1] * 255,
+                            (unsigned char)colorLines[2] * 255,
+                            (unsigned char)colorLines[3] * 255};
+        std::cout << colorLines[0] << ' ' << colorLines[1] << ' '
+                  << colorLines[2] << ' ' << colorLines[3] << '\n';
+      }
+      if (ImGui::ColorEdit4("Squares Color", (float*)&colorSquares)) {
+        squareColor = (Color){(unsigned char)colorSquares[0] * 255,
+                              (unsigned char)colorSquares[1] * 255,
+                              (unsigned char)colorSquares[2] * 255,
+                              (unsigned char)colorSquares[3] * 255};
       }
     }
 

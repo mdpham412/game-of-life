@@ -4,11 +4,15 @@
 #include <cmath>
 #include <vector>
 
+#include "imgui.h"
 #include "raylib.h"
 #include "raymath.h"
 
+extern Color backgroundColor;
+extern Color lineColor;
+extern Color squareColor;
+
 void initGrid(int col = 40, int row = 40);
-bool positionInSquare(Vector2 pos, Vector2 squareCenter, int squareSide);
 int getGridIndex(int row, int col);
 void updateGrid();
 void drawGrid();

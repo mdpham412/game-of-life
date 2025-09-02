@@ -54,7 +54,9 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
-if (WIN32)
+option(HIDE_CONSOLE "Hide Windows console window" OFF)
+
+if (WIN32 AND HIDE_CONSOLE)
     set_property(TARGET ${PROJECT_NAME} PROPERTY WIN32_EXECUTABLE TRUE)
 elseif(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
