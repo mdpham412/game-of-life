@@ -20,9 +20,6 @@ int rows{40};
 int cols{40};
 int speed{10};
 
-float ScaleToDPIF(float value) { return GetWindowScaleDPI().x * value; }
-int ScaleToDPII(int value) { return int(GetWindowScaleDPI().x * value); }
-
 void updateColors() {
   backgroundColor.r = (unsigned char)(colorBackground[0] * 255);
   backgroundColor.g = (unsigned char)(colorBackground[1] * 255);
