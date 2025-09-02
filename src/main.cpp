@@ -11,8 +11,32 @@
 constexpr int screenWidth{1280};
 constexpr int screenHeight{800};
 
+bool continueWindow = true;
+bool shouldUpdateGrid = false;
+float colorBackground[4]{0.0f, 0.0f, 0.0f, 1.0f};
+float colorLines[4]{1.0f, 1.0f, 1.0f, 1.0f};
+float colorSquares[4]{1.0f, 1.0f, 1.0f, 1.0f};
+int rows{40};
+int cols{40};
+int speed{10};
+
 float ScaleToDPIF(float value) { return GetWindowScaleDPI().x * value; }
 int ScaleToDPII(int value) { return int(GetWindowScaleDPI().x * value); }
+
+void updateColors() {
+  backgroundColor.r = (unsigned char)(colorBackground[0] * 255);
+  backgroundColor.g = (unsigned char)(colorBackground[1] * 255);
+  backgroundColor.b = (unsigned char)(colorBackground[2] * 255);
+  backgroundColor.a = (unsigned char)(colorBackground[3] * 255);
+  lineColor.r = (unsigned char)(colorLines[0] * 255);
+  lineColor.g = (unsigned char)(colorLines[1] * 255);
+  lineColor.b = (unsigned char)(colorLines[2] * 255);
+  lineColor.a = (unsigned char)(colorLines[3] * 255);
+  squareColor.r = (unsigned char)(colorSquares[0] * 255);
+  squareColor.g = (unsigned char)(colorSquares[1] * 255);
+  squareColor.b = (unsigned char)(colorSquares[2] * 255);
+  squareColor.a = (unsigned char)(colorSquares[3] * 255);
+}
 
 int main(int argc, char* argv[]) {
   // Initial setup
@@ -23,15 +47,6 @@ int main(int argc, char* argv[]) {
 
   ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   SetExitKey(KEY_NULL);
-
-  bool continueWindow = true;
-  bool shouldUpdateGrid = false;
-  float colorBackground[4]{0.0f, 0.0f, 0.0f, 1.0f};
-  float colorLines[4]{1.0f, 1.0f, 1.0f, 1.0f};
-  float colorSquares[4]{1.0f, 1.0f, 1.0f, 1.0f};
-  int rows{40};
-  int cols{40};
-  int speed{10};  // updates per second
 
   initGrid(cols, rows);
 
@@ -85,27 +100,13 @@ int main(int argc, char* argv[]) {
         initGrid(cols, rows);
         shouldUpdateGrid = false;
       }
-      if (ImGui::ColorEdit4("Background Color", (float*)&colorBackground)) {
-        backgroundColor = (Color){(unsigned char)colorBackground[0] * 255,
-                                  (unsigned char)colorBackground[1] * 255,
-                                  (unsigned char)colorBackground[2] * 255,
-                                  (unsigned char)colorBackground[3] * 255};
-      }
-      if (ImGui::ColorEdit4("Lines Color", (float*)&colorLines)) {
-        lineColor = (Color){(unsigned char)colorLines[0] * 255,
-                            (unsigned char)colorLines[1] * 255,
-                            (unsigned char)colorLines[2] * 255,
-                            (unsigned char)colorLines[3] * 255};
-        std::cout << colorLines[0] << ' ' << colorLines[1] << ' '
-                  << colorLines[2] << ' ' << colorLines[3] << '\n';
-      }
-      if (ImGui::ColorEdit4("Squares Color", (float*)&colorSquares)) {
-        squareColor = (Color){(unsigned char)colorSquares[0] * 255,
-                              (unsigned char)colorSquares[1] * 255,
-                              (unsigned char)colorSquares[2] * 255,
-                              (unsigned char)colorSquares[3] * 255};
-      }
+
+      ImGui::ColorEdit4("Background Color", (float*)&colorBackground);
+      ImGui::ColorEdit4("Lines Color", (float*)&colorLines);
+      ImGui::ColorEdit4("Squares Color", (float*)&colorSquares);
     }
+
+    updateColors();
 
     DrawFPS(0, 0);
 
