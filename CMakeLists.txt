@@ -10,8 +10,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src/include)
 file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 file(GLOB_RECURSE RLIMGUI_FILES "${PROJECT_SOURCE_DIR}/build/_deps/rllmgui-src/*.cpp")
 file(GLOB_RECURSE IMGUI_FILES "${PROJECT_SOURCE_DIR}/build/_deps/imgui-src/*.cpp")
-set(IMGUI_BACKENDS ${PROJECT_SOURCE_DIR}/build/_deps/imgui-src/backends/imgui_impl_opengl3.cpp 
-                   ${PROJECT_SOURCE_DIR}/build/_deps/imgui-src/backends/imgui_impl_glfw.cpp)
+set(IMGUI_BACKENDS ${PROJECT_SOURCE_DIR}/build/_deps/imgui-src/backends/imgui_impl_opengl3.cpp )
 
 list(FILTER RLIMGUI_FILES EXCLUDE REGEX ".*/examples/.*")
 list(FILTER IMGUI_FILES EXCLUDE REGEX ".*/examples/.*")
