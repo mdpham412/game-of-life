@@ -10,7 +10,8 @@ class Game {
  private:
   int rows{GameOfLifeConstants::defaultRowCount};
   int cols{GameOfLifeConstants::defaultColCount};
-  Color backgroundColour;
+  Color backgroundColour{BLACK};
+  Color lineColor{WHITE};
 
  public:
   Game(const int screenWidth, const int screenHeight);
@@ -19,5 +20,6 @@ class Game {
 
  private:
   void options();
+  void drawGrid();
 };
 #endif
