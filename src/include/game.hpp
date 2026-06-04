@@ -1,5 +1,6 @@
 #ifndef GAME_OF_LIFE
 #define GAME_OF_LIFE
+#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -21,12 +22,16 @@ class Game {
   float colourLines[4]{1.0f, 1.0f, 1.0f, 1.0f};
   float colourSquares[4]{1.0f, 1.0f, 1.0f, 1.0f};
   std::vector<bool> activated;
+  bool shouldUpdateGrid = false;
+  int speed{10};
 
   int squareSize;
   int gridWidth;
   int gridHeight;
   int paddingX;
   int paddingY;
+
+  std::chrono::steady_clock::time_point begin;
 
  public:
   Game(const int screenWidth, const int screenHeight);
@@ -44,5 +49,8 @@ class Game {
   void initGridSize();
   int getGridIndex(int row, int col);
   void updateGridSize(int newRows, int newCols);
+  void updateGrid();
+  void update();
+  void resetState();
 };
 #endif

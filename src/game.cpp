@@ -20,6 +20,7 @@ void Game::loop() {
     this->updateColors();
     this->checkForSquareActivation();
     this->draw();
+    this->update();
   }
 }
 void Game::options() {
@@ -37,8 +38,20 @@ void Game::options() {
     ImGui::ColorEdit4("Background Color", (float*)&this->colourBackground);
     ImGui::ColorEdit4("Lines Color", (float*)&this->colourLines);
     ImGui::ColorEdit4("Squares Color", (float*)&this->colourSquares);
+
     ImGui::Separator();
+
     ImGui::Text("Simulation Controls");
+    ImGui::SliderInt("Speed (updates/sec)", &speed, 1, 60);
+
+    if (ImGui::Button(shouldUpdateGrid ? "Pause" : "Play")) {
+      shouldUpdateGrid = !shouldUpdateGrid;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Reset")) {
+      shouldUpdateGrid = false;
+      this->resetState();
+    }
   }
 }
 void Game::draw() {
@@ -83,6 +96,7 @@ void Game::initGridSize() {
   paddingY = (GetScreenHeight() - gridHeight) / 2;
 }
 void Game::updateGridSize(int newRows, int newCols) {
+  shouldUpdateGrid = false;
   std::vector<bool> newActivated(newRows * newCols, false);
 
   int copyRows = std::min(rows, newRows);
@@ -136,4 +150,56 @@ void Game::checkForSquareActivation() {
       std::cout << "toggled square at " << row << " " << col << '\n';
     }
   }
+}
+void Game::updateGrid() {
+  std::vector<bool> nextActivated = activated;
+
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < cols; col++) {
+      int count = 0;
+
+      // Calculate the neighbors of a cell
+      for (int dr = -1; dr <= 1; dr++) {
+        for (int dc = -1; dc <= 1; dc++) {
+          if (dr == 0 && dc == 0) continue;
+
+          int nr = row + dr;
+          int nc = col + dc;
+
+          if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+            int idx = getGridIndex(nr, nc);
+            if (activated[idx]) count++;
+          }
+        }
+      }
+
+      // Rules
+      int current_idx = getGridIndex(row, col);
+      if (!activated[current_idx]) {
+        if (count == 3) nextActivated[current_idx] = true;
+      } else {
+        if (count > 3)
+          nextActivated[current_idx] = false;
+        else if (count < 2)
+          nextActivated[current_idx] = false;
+      }
+    }
+  }
+  activated = nextActivated;
+}
+void Game::update() {
+  namespace sc = std::chrono;
+
+  long long update_interval_us = 1000000 / speed;
+  sc::steady_clock::time_point end = sc::steady_clock::now();
+  if (!shouldUpdateGrid)
+    begin = sc::steady_clock::now();
+  else if (sc::duration_cast<sc::microseconds>(end - begin).count() >
+           update_interval_us) {
+    updateGrid();
+    begin = sc::steady_clock::now();
+  }
+}
+void Game::resetState() {
+  std::fill(activated.begin(), activated.end(), false);
 }
