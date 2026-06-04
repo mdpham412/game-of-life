@@ -1,5 +1,6 @@
 #ifndef GAME_OF_LIFE
 #define GAME_OF_LIFE
+#include <cmath>
 #include <iostream>
 #include <vector>
 
@@ -33,12 +34,15 @@ class Game {
   void loop();
 
  private:
+  // draws imgui menu
   void options();
   void drawGrid();
+  // changes ___Colour variables according to colour____ variables
   void updateColors();
   void draw();
   void checkForSquareActivation();
-  void updateGridSize();
+  void initGridSize();
   int getGridIndex(int row, int col);
+  void updateGridSize(int newRows, int newCols);
 };
 #endif

@@ -8,7 +8,8 @@ Game::Game(int screenWidth, int screenHeight) {
   ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   SetExitKey(KEY_NULL);
 
-  this->updateGridSize();
+  activated.assign(rows * cols, false);
+  this->initGridSize();
 }
 Game::~Game() {
   rlImGuiShutdown();
@@ -24,10 +25,14 @@ void Game::loop() {
 void Game::options() {
   if (ImGui::Begin("Controls")) {
     ImGui::Text("Grid Customization");
-    bool rows_changed = ImGui::SliderInt("Rows", &rows, 10, 200);
-    bool cols_changed = ImGui::SliderInt("Columns", &cols, 10, 200);
+    int newRows = rows;
+    int newCols = cols;
+
+    bool rows_changed = ImGui::SliderInt("Rows", &newRows, 10, 100);
+    bool cols_changed = ImGui::SliderInt("Columns", &newCols, 10, 100);
+
     if (rows_changed || cols_changed) {
-      this->updateGridSize();
+      this->updateGridSize(newRows, newCols);
     }
     ImGui::ColorEdit4("Background Color", (float*)&this->colourBackground);
     ImGui::ColorEdit4("Lines Color", (float*)&this->colourLines);
@@ -68,7 +73,7 @@ void Game::updateColors() {
   squareColour.b = (unsigned char)(this->colourSquares[2] * 255);
   squareColour.a = (unsigned char)(this->colourSquares[3] * 255);
 }
-void Game::updateGridSize() {
+void Game::initGridSize() {
   squareSize = std::min(GetScreenWidth() / cols, GetScreenHeight() / rows) - 1;
 
   gridWidth = cols * squareSize;
@@ -76,7 +81,24 @@ void Game::updateGridSize() {
 
   paddingX = (GetScreenWidth() - gridWidth) / 2;
   paddingY = (GetScreenHeight() - gridHeight) / 2;
-  activated.assign(rows * cols, false);
+}
+void Game::updateGridSize(int newRows, int newCols) {
+  std::vector<bool> newActivated(newRows * newCols, false);
+
+  int copyRows = std::min(rows, newRows);
+  int copyCols = std::min(cols, newCols);
+
+  for (int row = 0; row < copyRows; row++) {
+    for (int col = 0; col < copyCols; col++) {
+      newActivated[row * newCols + col] = activated[row * cols + col];
+    }
+  }
+
+  rows = newRows;
+  cols = newCols;
+  activated = std::move(newActivated);
+
+  initGridSize();
 }
 int Game::getGridIndex(int row, int col) { return row * cols + col; }
 void Game::drawGrid() {
@@ -101,7 +123,6 @@ void Game::drawGrid() {
              paddingY + gridHeight, lineColour);
   }
 }
-
 void Game::checkForSquareActivation() {
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
       !ImGui::GetIO().WantCaptureMouse) {
