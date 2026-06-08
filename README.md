@@ -4,6 +4,17 @@
 
 This is my personal implementation of the popular Conway's Game of Life with as many customizable options as possible.
 
+## Why did I make this?
+
+I thought that this project would be interesting for some and that it would be a good project to help me brush up on my C++ skills.
+
+## What features does this have
+
+This is a Game of Life simulator that features:
+
+- customizable graphics
+- simulation configuration
+
 ## Setup and compilation
 
 > [!NOTE]  
